@@ -19,7 +19,7 @@ const Login = () => {
 
       const { displayName, email } = result.user;
       const newUser = { name: displayName || "Anonymous", email };
-      await axios.post("http://localhost:5000/user/add", newUser);
+      //await axios.post("http://localhost:5000/user/add", newUser);
 
       toast.success("Successfully Logged In!");
       navigate("/");

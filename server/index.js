@@ -644,12 +644,6 @@ app.post("/user/add", (req, res) => {
   const query = `
     INSERT INTO users (user_id,name, email, purchased_car_ids, rented_car_ids, purchased_service_ids, is_admin)
     VALUES (?, ?, ?, ?, ?, ?,?)
-    ON DUPLICATE KEY UPDATE 
-      name = VALUES(name),
-      purchased_car_ids = VALUES(purchased_car_ids),
-      rented_car_ids = VALUES(rented_car_ids),
-      purchased_service_ids = VALUES(purchased_service_ids),
-      is_admin = VALUES(is_admin);
   `;
 
   db.query(
