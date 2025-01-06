@@ -31,7 +31,7 @@ const CarDetails = () => {
   const handlePurchase = async () => {
     if (!user) {
       toast.error("You need to log in to make a purchase.");
-      navigate("/login");
+      navigate(`/user/${user.email}`);
       return;
     }
 

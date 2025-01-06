@@ -631,46 +631,47 @@ app.get("/user/:email", (req, res) => {
 
 // Add a user
 app.post("/user/add", (req, res) => {
-  const { name, email } = req.body;
+  const {
+    user_id,
+    name,
+    email,
+    purchased_car_ids = "",
+    rented_car_ids = "",
+    purchased_service_ids = "",
+    is_admin = false,
+  } = req.body;
 
-  const query = "SELECT * FROM users WHERE email = ?";
-  db.query(query, [email], (err, results) => {
-    if (err) {
-      console.error("Error checking user:", err);
-      return res.status(500).json({ message: "Database error." });
-    } else if (results.length > 0) {
-      return res.status(200).json({ user: results[0] });
-    } else {
-      const queryInsert = `
-      INSERT INTO users (name, email, purchased_car_ids, rented_car_ids, purchased_service_ids, is_admin, admin_request) 
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `;
+  const query = `
+    INSERT INTO users (user_id,name, email, purchased_car_ids, rented_car_ids, purchased_service_ids, is_admin)
+    VALUES (?, ?, ?, ?, ?, ?,?)
+    ON DUPLICATE KEY UPDATE 
+      name = VALUES(name),
+      purchased_car_ids = VALUES(purchased_car_ids),
+      rented_car_ids = VALUES(rented_car_ids),
+      purchased_service_ids = VALUES(purchased_service_ids),
+      is_admin = VALUES(is_admin);
+  `;
 
-      db.query(
-        queryInsert,
-        [name, email, null, null, null, false, false],
-        (err, result) => {
-          if (err) {
-            console.error("Error adding user:", err);
-            return res.status(500).json({ message: "Failed to add user." });
-          }
+  db.query(
+    query,
+    [
+      user_id,
+      name,
+      email,
+      purchased_car_ids,
+      rented_car_ids,
+      purchased_service_ids,
+      is_admin,
+    ],
+    (err) => {
+      if (err) {
+        console.error("Error adding user to database:", err);
+        return res.status(500).json({ message: "Database error." });
+      }
 
-          res.status(201).json({
-            user: {
-              user_id: result.insertId,
-              name,
-              email,
-              purchased_car_ids: null,
-              rented_car_ids: null,
-              purchased_service_ids: null,
-              is_admin: false,
-              admin_request: false,
-            },
-          });
-        }
-      );
+      res.status(201).json({ message: "User added successfully." });
     }
-  });
+  );
 });
 
 app.listen(process.env.PORT, () => {

@@ -23,6 +23,22 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const [dbuser, setDBUser] = useState(0);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/user");
+        setDBUser(response.data);
+        //console.log("Users fetched successfully:", response.data);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
   const createUser = async (email, password, name) => {
     setLoading(true);
     try {
@@ -64,7 +80,12 @@ const AuthProvider = ({ children }) => {
         name: displayName || "Anonymous",
         email,
       };
-      await axios.post("http://localhost:5000/user/add", newUser);
+      if (
+        dbuser.length === 0 ||
+        dbuser.filter((user) => user.email === email).length === 0
+      ) {
+        await axios.post("http://localhost:5000/user/add", newUser);
+      }
 
       return result;
     } catch (error) {

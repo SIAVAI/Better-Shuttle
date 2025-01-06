@@ -28,6 +28,7 @@ import EditShowroom from "./Pages/EditShowroom.jsx";
 import EditService from "./Pages/EditService.jsx";
 import EditRental from "./Pages/EditRental.jsx";
 import SingleService from "./Pages/Services/SingleService.jsx";
+import ProtectedRoute from "./Protected/ProtectedRoute.jsx";
 
 const router = createBrowserRouter([
   {
@@ -41,15 +42,27 @@ const router = createBrowserRouter([
       },
       {
         path: "/showroom",
-        element: <Showroom></Showroom>,
+        element: (
+          <ProtectedRoute>
+            <Showroom></Showroom>
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/service",
-        element: <Services></Services>,
+        element: (
+          <ProtectedRoute>
+            <Services></Services>
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/rental",
-        element: <Rentals></Rentals>,
+        element: (
+          <ProtectedRoute>
+            <Rentals></Rentals>
+          </ProtectedRoute>
+        ),
       },
 
       {

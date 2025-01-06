@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import reg from "../../assets/auth/login.svg";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { AuthContext } from "../../Provider/AuthProvider";
 import axios from "axios";
@@ -12,6 +12,24 @@ const Reg = () => {
   const { from } = location.state || "/";
   const { user, updateUserProfile, createUser, signInWithGoogle, setUser } =
     useContext(AuthContext);
+
+  const [dbuser, setDBUser] = useState(0);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/user");
+        setDBUser(response.data);
+        //console.log("Users fetched successfully:", response.data);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  //console.log("DB User:", dbuser ? dbuser.length : 0);
 
   //Google Sign In
   const handleGoogleSignIn = async () => {
@@ -34,20 +52,28 @@ const Reg = () => {
 
     try {
       const userCredential = await createUser(email, pass, name);
+
       if (name || photo) {
         await updateUserProfile(name, photo);
       }
+
       const newUser = {
+        user_id: dbuser.length + 10,
         name: name || "Anonymous",
         email: userCredential.user.email,
+        purchased_car_ids: "",
+        rented_car_ids: "",
+        purchased_service_ids: "",
+        is_admin: false,
       };
 
       await axios.post("http://localhost:5000/user/add", newUser);
+
       toast.success("Sign Up Successful!");
       navigate("/");
     } catch (error) {
-      console.error("Error during sign-up:", error);
-      toast.error("There was an error. Try again!");
+      console.error("Error during sign-up:", error.message);
+      toast.error(`There was an error. ${error.message} Try again!`);
     }
   };
 

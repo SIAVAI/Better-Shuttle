@@ -1,10 +1,20 @@
 import { useNavigate } from "react-router-dom";
 import { FaCar, FaTools, FaCarSide } from "react-icons/fa";
+import { useContext } from "react";
+import { AuthContext } from "../../Provider/AuthProvider";
 
 const FeaturedSection = () => {
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
 
-  // Data for Cards
+  const handleNavigate = (route) => {
+    if (user) {
+      navigate(route);
+    } else {
+      navigate("/login");
+    }
+  };
+
   const services = [
     {
       title: "Car Showroom",
@@ -47,7 +57,7 @@ const FeaturedSection = () => {
             <div
               key={index}
               className="relative bg-white shadow-lg rounded-lg overflow-hidden group cursor-pointer"
-              onClick={() => navigate(service.route)}
+              onClick={() => handleNavigate(service.route)}
             >
               {/* Icon */}
               <div className="flex justify-center items-center bg-gray-800 text-red-500 w-16 h-16 rounded-full mx-auto mt-6 group-hover:scale-110 transition-transform duration-300">
